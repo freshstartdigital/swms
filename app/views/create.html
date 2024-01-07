@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Styled Hello World</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Create</h1>
+    </div>
+        <form hx-post="/api/swms/schema"  hx-swap="outerHTML ignoreTitle:true" >
+            <input type="text" name="name" placeholder="Name">
+            <button class="button" type="submit">Create</button>
+        </form>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Styled Hello World</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="header">
+
+        <h1>SWMS Generator</h1>
+        <a href="/create">
+            <button class="button">Create</button>
+        </a>
+    </div>
+
+    {{range .Swms}}
+    <div class="swms_table">
+        <p class="swms_name">
+            {{.Name}}
+        </p>
+        <p class="swms_type">
+            {{.SwmsType}}
+        </p>
+    </div>
+    {{end}}
+</body>
+</html>

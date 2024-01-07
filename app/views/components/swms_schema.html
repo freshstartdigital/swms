@@ -1,0 +1,60 @@
+
+    <script>
+    
+        var formdata = {}
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            console.log("DOM fully loaded and parsed");
+            data = JSON.parse(data)
+            console.log(data)
+        });
+
+        function changehandler(checkbox) {
+        if (checkbox.checked) {
+            formdata[checkbox.name] = checkbox.value;
+        } else {
+            delete formdata[checkbox.name];
+        }
+        console.log(formdata);
+        console.log(data)
+    }
+
+        function submitHandler(e) {
+            e.preventDefault();
+            var form = e.target.value;
+            var formData = new FormData(form);
+            var data = Object.fromEntries(formData);
+            console.log(data);
+
+
+        }
+
+        var form = document.getElementById("form");
+        form.addEventListener("submit", submitHandler);
+
+
+
+    </script>
+    <form id="form">
+
+        {{range .}}
+        <div class="create_swms_card">
+            <h6>{{.Name}}</h6>
+            {{range .Values}}
+            <div class="input_section">
+                
+                <input onchange="changehandler(this)" type="checkbox" name="{{range .Task}}{{.}}{{end}}" id="{{.SubId}}" value="{{.SubId}}">
+                <label for="{{.SubId}}">
+                    <p>
+                        {{range .Task}}
+                        {{.}}
+                        {{end}}
+                    </p>
+                </label>
+            </div>
+            <br>
+            {{end}}
+        </div>
+        {{end}}
+        <button class="button" type="submit">Create</button>
+    </form>
