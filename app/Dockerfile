@@ -38,13 +38,11 @@ WORKDIR /root/
 COPY --from=builder /app/main .
 
 #Delete old static and view files
-RUN rm -rf /root/static
-RUN rm -rf /root/views
+RUN rm -rf /root/static /root/views
 
 # Copy static assets from the builder stage
-COPY ./static /root/static
+COPY ./static/styles.css /root/static/styles.css
 COPY ./views /root/views
-
 
 # Set the binary as the entrypoint of the container
 CMD ["./main"]

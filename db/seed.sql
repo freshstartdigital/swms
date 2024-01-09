@@ -46,8 +46,11 @@ CREATE TABLE sessions
 
 -- Insert users
 INSERT INTO users (password, email, created_at, updated_at)
-VALUES ('hashed_password1', 'user1@example.com', NOW(), NOW());
+VALUES ('password', 'ryan.slater@droneanalytics.com.au', NOW(), NOW());
 
 INSERT INTO users (password, email, created_at, updated_at)
-VALUES ('hashed_password2', 'user2@example.com', NOW(), NOW());
+VALUES ('password', 'justin.keating@droneanalytics.com.au', NOW(), NOW());
+
+INSERT INTO users (password, email, created_at, updated_at)
+VALUES ('password', 'george.frilingos@freshstartprojects.com.au', NOW(), NOW());
 

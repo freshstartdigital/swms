@@ -8,11 +8,20 @@
     <title>Document</title>
 </head>
 <body>
-    <div>
-        <h6>Login</h6>
-        <form hx-post="/login" method="POST">
-            <input type="text" name="email" placeholder="Email">
-            <input type="password" name="password" placeholder="Password">
+    <div class="login_form">
+        <form hx-post="/login" class="login_card" method="POST">
+            <h6>Login</h6>
+            <div class="material-text-field">
+                <input type="text" id="email" name="email" placeholder="Email" >
+                <label for="email">Email</label>
+            </div>
+         
+            <div class="material-text-field">
+                <input type="password" id="password" name="password" placeholder="Password" >
+                <label for="email">Password</label>
+            </div>
+         
+ 
             <button class="button" type="submit">Login</button>
         </form>
     </div>
