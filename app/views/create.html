@@ -68,7 +68,7 @@
                 var data = await response.json();
                 if (Array.isArray(data)) {
                     schema_data = data;
-                    console.log(schema_data);
+              
                 }
             }
         });
@@ -76,6 +76,8 @@
         document.addEventListener("DOMContentLoaded", function(event) {
             document.getElementById("form").addEventListener("submit", submitHandler);
         });
+
+       
 
     </script>
 
@@ -87,7 +89,7 @@
             </div>
 
         </div>
-
+    
         {{range .}}
         <div class="create_swms_card">
             <h6>{{.Name}}</h6>

@@ -58,7 +58,7 @@ services:
     restart: always
 
   pdfgenerator:
-    platform: linux/arm64/v8
+    platform: linux/amd64
     build:
       context: ../../pdf
       dockerfile: Dockerfile
