@@ -9,6 +9,7 @@ var SwmsSchema = []models.SWMSTableData{
 		Values: []models.SWMSValue{
 			{
 				SubId:            1,
+				ParentId:         1,
 				Task:             []string{"Unload vehicle"},
 				PotentialHazards: []string{"Musculoskeletal strains", "Slips, trips and falls"},
 				RiskBefore:       "3",
@@ -24,8 +25,9 @@ var SwmsSchema = []models.SWMSTableData{
 				RiskAfter: "5",
 			},
 			{
-				SubId: 2,
-				Task:  []string{"Working in the sun Dangerous UV Rays"},
+				SubId:    2,
+				ParentId: 1,
+				Task:     []string{"Working in the sun Dangerous UV Rays"},
 				PotentialHazards: []string{
 					"Exposure to UV radiation.",
 					"Heat stress",
@@ -64,6 +66,7 @@ var SwmsSchema = []models.SWMSTableData{
 			},
 			{
 				SubId:            3,
+				ParentId:         1,
 				Task:             []string{"Unloading vehicle (cont.)"},
 				PotentialHazards: []string{"Electrical Hazards", "Fire"},
 				RiskBefore:       "1",
@@ -88,6 +91,7 @@ var SwmsSchema = []models.SWMSTableData{
 		Values: []models.SWMSValue{
 			{
 				SubId:            1,
+				ParentId:         2,
 				Task:             []string{"Use of hand and power tools"},
 				PotentialHazards: []string{"Electrocution", "Cuts and abrasions", "Eye and hearing damage"},
 				RiskBefore:       "1",
@@ -108,8 +112,9 @@ var SwmsSchema = []models.SWMSTableData{
 				RiskAfter: "4",
 			},
 			{
-				SubId: 2,
-				Task:  []string{"Use of hand and power tools (cont.)"},
+				SubId:    2,
+				ParentId: 2,
+				Task:     []string{"Use of hand and power tools (cont.)"},
 				PotentialHazards: []string{
 					"Exposure to UV radiation.",
 					"Heat stress",
@@ -137,6 +142,7 @@ var SwmsSchema = []models.SWMSTableData{
 			},
 			{
 				SubId:            3,
+				ParentId:         2,
 				Task:             []string{"Using Ladders"},
 				PotentialHazards: []string{"Falling"},
 				RiskBefore:       "1",
@@ -152,6 +158,7 @@ var SwmsSchema = []models.SWMSTableData{
 			},
 			{
 				SubId:            4,
+				ParentId:         2,
 				Task:             []string{"Sweeping"},
 				PotentialHazards: []string{"Dust – silicosis (RCS)", ""},
 				RiskBefore:       "1",
@@ -184,7 +191,8 @@ var SwmsSchema = []models.SWMSTableData{
 		ID:   3,
 		Values: []models.SWMSValue{
 			{
-				SubId: 1,
+				SubId:    1,
+				ParentId: 3,
 				Task: []string{
 					"Concrete Floor Grinding",
 					"Concrete Cutting",
@@ -256,7 +264,8 @@ var SwmsSchema = []models.SWMSTableData{
 				RiskAfter: "4",
 			},
 			{
-				SubId: 2,
+				SubId:    2,
+				ParentId: 3,
 				Task: []string{
 					"Concrete Floor Grinding",
 					"Concrete Cutting",
@@ -298,7 +307,8 @@ var SwmsSchema = []models.SWMSTableData{
 		ID:   4,
 		Values: []models.SWMSValue{
 			{
-				SubId: 1,
+				SubId:    1,
+				ParentId: 4,
 				Task: []string{
 					"Manual handling / locations of the loads and distances to be moved",
 				},
@@ -327,6 +337,7 @@ var SwmsSchema = []models.SWMSTableData{
 		Values: []models.SWMSValue{
 			{
 				SubId:            1,
+				ParentId:         5,
 				Task:             []string{"Sheeting and guttering"},
 				PotentialHazards: []string{"Asbestos related diseases"},
 				RiskBefore:       "1",
@@ -359,6 +370,7 @@ var SwmsSchema = []models.SWMSTableData{
 			},
 			{
 				SubId:            2,
+				ParentId:         5,
 				Task:             []string{"Bonded or friable asbestos in excess of 10 sq. metres."},
 				PotentialHazards: []string{"Asbestos related diseases"},
 				RiskBefore:       "1",

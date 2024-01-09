@@ -1,9 +1,22 @@
+CREATE TABLE users
+(
+  id SERIAL,
+  password VARCHAR(255) NOT NULL, -- Store hashed passwords for security
+  email VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE(email)
+);
+
 
 CREATE TABLE swms
 (
   id SERIAL,
+  user_id INTEGER REFERENCES users(id),
   name VARCHAR(255) NOT NULL,
   swms_type VARCHAR(255) NOT NULL,
+  generator_status VARCHAR(255) NOT NULL DEFAULT 'loading',
   file_name VARCHAR(255),
   file_path VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL,
@@ -20,15 +33,21 @@ CREATE TABLE swms_data
   PRIMARY KEY (id)
 );
 
+CREATE TABLE sessions
+(
+  id SERIAL,
+  user_id INTEGER REFERENCES users(id),
+  session_token VARCHAR(255) NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE(session_token)
+);
 
-INSERT INTO swms (name, swms_type, file_name, file_path, created_at, updated_at)
-VALUES ('SWMS 1', 'swms', 'swms1.pdf', 'swms1.pdf', NOW(), NOW());
 
-INSERT INTO swms (name, swms_type, file_name, file_path, created_at, updated_at)
-VALUES ('SWMS 2', 'swms', 'swms2.pdf', 'swms2.pdf', NOW(), NOW());
+-- Insert users
+INSERT INTO users (password, email, created_at, updated_at)
+VALUES ('hashed_password1', 'user1@example.com', NOW(), NOW());
 
-INSERT INTO swms_data (swms_id, data, version)
-VALUES (1, '{"name": "SWMS 1", "swms_type": "swms", "file_name": "swms1.pdf", "file_path": "swms1.pdf"}', 1);
+INSERT INTO users (password, email, created_at, updated_at)
+VALUES ('hashed_password2', 'user2@example.com', NOW(), NOW());
 
-INSERT INTO swms_data (swms_id, data, version)
-VALUES (2, '{"name": "SWMS 2", "swms_type": "swms", "file_name": "swms2.pdf", "file_path": "swms2.pdf"}', 1);

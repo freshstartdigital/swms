@@ -11,7 +11,7 @@ h1 {
 .swms_table {
     display: flex;
     background-color: #fff;
-    padding:  10px;
+    padding:  20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     margin: 10px;
@@ -56,6 +56,7 @@ h1 {
 .create_swms_card h6 {
     margin: 0;
     font-size: 18px;
+
   
 }
 
@@ -74,4 +75,83 @@ h1 {
     justify-content: center;
     width: 100%;
 
+}
+
+.material-text-field {
+    position: relative;
+    margin-top: 20px;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+.material-text-field input[type="text"] {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+    padding: 10px 5px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.material-text-field input[type="text"]:focus {
+    border-bottom: 2px solid #3f51b5; /* Material UI primary color */
+}
+
+.material-text-field label {
+    color: #999;
+    font-size: 16px;
+    position: absolute;
+    pointer-events: none;
+    left: 5px;
+    top: 10px;
+    transition: 0.2s ease all;
+}
+
+.material-text-field input[type="text"]:focus ~ label,
+.material-text-field input[type="text"]:valid ~ label {
+    top: -20px;
+    font-size: 12px;
+    color: #3f51b5; /* Material UI primary color */
+}
+
+.loader {
+    border: 10px solid #f3f3f3; /* Light grey background */
+    border-top: 10px solid #3498db; /* Blue color for the spinner */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.download-icon {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+}
+
+.arrow {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    position: absolute;
+    top: 8px;
+    left: 10px;
+}
+
+.line {
+    position: absolute;
+    bottom: 0;
+    left: 14px;
+    height: 15px;
+    width: 2px;
+    background-color: black;
 }

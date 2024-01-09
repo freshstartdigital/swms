@@ -4,6 +4,13 @@ FROM golang:1.21.3 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
+
+ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
 # Copy go.mod and go.sum files first; they change less often than the source code
 COPY go.mod go.sum ./
 
@@ -30,9 +37,11 @@ WORKDIR /root/
 # Copy the pre-built binary file from the previous stage
 COPY --from=builder /app/main .
 
+#Delete old static and view files
+RUN rm -rf /root/static
+RUN rm -rf /root/views
+
 # Copy static assets from the builder stage
-# COPY --from=builder /app/views/ ./views/
-# COPY --from=builder /app/static/ ./static/
 COPY ./static /root/static
 COPY ./views /root/views
 
