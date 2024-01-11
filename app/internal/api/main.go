@@ -44,7 +44,7 @@ func CreateSwms(w http.ResponseWriter, r *http.Request) {
 	db := repository.ConnectDB()
 	defer db.Close()
 	var swmsID int
-	swmsID, err = db.CreateSwms(user, createSwmsRequest.ProjectAddress, createSwmsRequest.TableData)
+	swmsID, err = db.CreateSwms(user, createSwmsRequest.ProjectAddress, createSwmsRequest.TableData, "construction")
 
 	if err != nil {
 		log.Printf("Error creating swms: %v", err)

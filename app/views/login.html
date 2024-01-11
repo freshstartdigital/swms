@@ -8,16 +8,25 @@
     <title>Document</title>
 </head>
 <body>
+    <script>
+        document.addEventListener("loginSuccess", function() {
+            setTimeout(() => {
+                console.log("reloading", loginSuccess);
+                location.replace('/')
+                location.reload()
+            }, 2000);
+    })
+    </script>
     <div class="login_form">
-        <form hx-post="/login" class="login_card" method="POST">
+        <form hx-post="/api/login"  hx-swap="innerHTML" class="login_card" method="POST">
             <h6>Login</h6>
             <div class="material-text-field">
-                <input type="text" id="email" name="email" placeholder="Email" >
+                <input required type="text" id="email" name="email" placeholder="Email" >
                 <label for="email">Email</label>
             </div>
          
             <div class="material-text-field">
-                <input type="password" id="password" name="password" placeholder="Password" >
+                <input required type="password" id="password" name="password" placeholder="Password" >
                 <label for="email">Password</label>
             </div>
          

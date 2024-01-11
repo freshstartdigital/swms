@@ -27,23 +27,16 @@ type ControlMeasure struct {
 }
 
 type Swms struct {
-	ID              int        `json:"id"`
-	Name            string     `json:"name"`
-	SwmsType        string     `json:"swms_type"`
-	FileName        *string    `json:"file_name,omitempty"`
-	FilePath        *string    `json:"file_path,omitempty"`
-	UserId          int        `json:"user_id"`
-	GeneratorStatus string     `json:"generator_status"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
-	SwmsData        []SwmsData `json:"swms_data"`
-}
-
-type SwmsData struct {
-	ID      int             `json:"id"`
-	SwmsID  int             `json:"swms_id"`
-	Data    json.RawMessage `json:"data"` // JSONB type is best represented by json.RawMessage
-	Version int             `json:"version"`
+	ID              int             `json:"id"`
+	Name            string          `json:"name"`
+	SwmsType        string          `json:"swms_type"`
+	FileName        *string         `json:"file_name,omitempty"`
+	FilePath        *string         `json:"file_path,omitempty"`
+	UserId          int             `json:"user_id"`
+	GeneratorStatus string          `json:"generator_status"`
+	CreatedAt       time.Time       `json:"created_at"`
+	UpdatedAt       time.Time       `json:"updated_at"`
+	SwmsData        json.RawMessage `json:"swms_data"` // JSONB type is best represented by json.RawMessage
 }
 
 type SwmsSchema struct {

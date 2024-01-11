@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"log"
 	"net/http"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"example.com/internal/repository"
 )
 
-func generateSessionToken() (string, error) {
+func GenerateSessionToken() (string, error) {
 	b := make([]byte, 32) // 32 bytes generates a 256-bit random number
 	_, err := rand.Read(b)
 	if err != nil {
@@ -19,23 +20,23 @@ func generateSessionToken() (string, error) {
 	return base64.URLEncoding.EncodeToString(b), nil
 }
 
-func Login(email string, password string, w http.ResponseWriter) (models.User, error) {
+func Login(email string, password string, w http.ResponseWriter, r *http.Request) (models.Users, string, error) {
 	db := repository.ConnectDB()
 	defer db.Close()
 
-	user, err := db.LoginHandler(email, password)
+	user, err := db.GetUser(email, password)
 	if err != nil {
-		return user, err
+		return user, "", err
 	}
 
 	// Generate a secure session token
-	sessionToken, err := generateSessionToken()
+	sessionToken, err := GenerateSessionToken()
 	if err != nil {
-		return user, err // Handle the error properly
+		return user, "", err // Handle the error properly
 	}
 
-	// Store the session token in your session store with user details
-	err = db.StoreSessionTokenHandler(sessionToken, user.ID)
+	// Store the session token in your session store with user details and IP address
+	err = db.CreateSession(sessionToken, user.ID, r.RemoteAddr)
 
 	// Set the session token as a cookie
 	http.SetCookie(w, &http.Cookie{
@@ -45,14 +46,15 @@ func Login(email string, password string, w http.ResponseWriter) (models.User, e
 		Path:    "/",                            // Global path
 	})
 
-	return user, nil
+	return user, sessionToken, nil
 }
 
-func Authenticate(r *http.Request) (models.User, error) {
+func Authenticate(r *http.Request) (models.Users, error) {
 	// Get the session cookie
 	c, err := r.Cookie("swms_session_token")
 	if err != nil {
-		return models.User{}, err
+		log.Printf("Error getting session cookie: %v", err)
+		return models.Users{}, err
 	}
 
 	// Get the session token value
@@ -64,7 +66,7 @@ func Authenticate(r *http.Request) (models.User, error) {
 	db := repository.ConnectDB()
 	defer db.Close()
 
-	user, err := db.AuthenticateHandler(sessionToken)
+	user, err := db.GetUserBySession(sessionToken)
 	if err != nil {
 		return user, err
 	}

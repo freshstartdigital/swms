@@ -1,14 +1,39 @@
+CREATE TABLE organisation_types
+(
+  id SERIAL,
+  type VARCHAR(255) NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE organisations
+(
+  id SERIAL,
+  organisation_type_id INTEGER REFERENCES organisation_types(id) DEFAULT 2,
+  name VARCHAR(255) NOT NULL,
+  business_address VARCHAR(255) NOT NULL DEFAULT '',
+  abn VARCHAR(255) NOT NULL DEFAULT '',
+  business_phone VARCHAR(255) NOT NULL DEFAULT '',
+  business_email VARCHAR(255) NOT NULL DEFAULT '',
+  logo_file_name VARCHAR(255) NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  account_holder_id INTEGER,
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE users
 (
   id SERIAL,
-  password VARCHAR(255) NOT NULL, -- Store hashed passwords for security
+  organisation_id INTEGER REFERENCES organisations(id),
   email VARCHAR(255) NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
+  name VARCHAR(255) NOT NULL DEFAULT '',
+  password VARCHAR(255) NOT NULL, -- Store hashed passwords for security
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id),
   UNIQUE(email)
 );
-
 
 CREATE TABLE swms
 (
@@ -17,19 +42,11 @@ CREATE TABLE swms
   name VARCHAR(255) NOT NULL,
   swms_type VARCHAR(255) NOT NULL,
   generator_status VARCHAR(255) NOT NULL DEFAULT 'loading',
+  swms_data JSONB NOT NULL DEFAULT '{}',
   file_name VARCHAR(255),
   file_path VARCHAR(255),
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE swms_data
-(
-  id SERIAL,
-  swms_id INTEGER REFERENCES swms(id),
-  data JSONB,
-  version INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id)
 );
 
@@ -38,19 +55,85 @@ CREATE TABLE sessions
   id SERIAL,
   user_id INTEGER REFERENCES users(id),
   session_token VARCHAR(255) NOT NULL,
+  ip_address VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   expires_at TIMESTAMPTZ NOT NULL,
   PRIMARY KEY (id),
   UNIQUE(session_token)
 );
 
+CREATE TABLE licence_keys
+(
+  id SERIAL,
+  organisation_id INTEGER,
+  licence_key VARCHAR(255) NOT NULL,
+  key_status VARCHAR(255) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id),
+  UNIQUE(licence_key)
+);
+
+CREATE TABLE subscription_plan
+(
+  id SERIAL,
+  stripe_plan_id VARCHAR(255),
+  description VARCHAR(255),
+  price INTEGER,
+  duration VARCHAR(255),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE login_attempts
+(
+  id SERIAL,
+  ip_address VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE banned_ips
+(
+  id SERIAL,
+  ip_address VARCHAR(255) NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE password_resets
+(
+  id SERIAL,
+  user_id INTEGER REFERENCES users(id),
+  token VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id)
+);
+
+
+-- Insert organisation types
+INSERT INTO organisation_types (type, display_name)
+VALUES ('ADMIN', 'Administrator');
+
+INSERT INTO organisation_types (type, display_name)
+VALUES ('USER', 'User');
+
+-- Insert organisations
+INSERT INTO organisations (name, account_holder_id, organisation_type_id, business_address, abn, business_phone, business_email)  
+VALUES ('Fresh Start Project', 1, 1, '2/15 Montague Street, Stones Corner, QLD 4120', '52 648 576 390', '1300 980 999', 'george.frilingos@freshstart.edu.au');
+
+INSERT INTO licence_keys (organisation_id, licence_key)
+VALUES (1, '1234567890');
 
 -- Insert users
-INSERT INTO users (password, email, created_at, updated_at)
-VALUES ('password', 'ryan.slater@droneanalytics.com.au', NOW(), NOW());
+INSERT INTO users (organisation_id, password, email, name)
+VALUES (1, 'password', 'ryan.slater@droneanalytics.com.au', 'Ryan Slater');
 
-INSERT INTO users (password, email, created_at, updated_at)
-VALUES ('password', 'justin.keating@droneanalytics.com.au', NOW(), NOW());
+INSERT INTO users (organisation_id, password, email, name)
+VALUES (1, 'password', 'justin.keating@droneanalytics.com.au', 'Justin Keating');
 
-INSERT INTO users (password, email, created_at, updated_at)
-VALUES ('password', 'george.frilingos@freshstartprojects.com.au', NOW(), NOW());
+INSERT INTO users (organisation_id, password, email, name)
+VALUES (1, 'password', 'george.frilingos@freshstartprojects.com.au', 'George Frilingos');
 
