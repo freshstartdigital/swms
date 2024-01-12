@@ -82,11 +82,7 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 		services.GetFilePath(&swms[i])
 	}
 
-	data := HomePageResponse{
-		Swms: swms,
-	}
-
-	tmp_err := tmpl.Execute(w, data)
+	tmp_err := tmpl.Execute(w, swms)
 	if tmp_err != nil {
 		// Log the error
 		log.Printf("Error executing template: %v", err)

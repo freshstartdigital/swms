@@ -7,9 +7,6 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
-    <div class="header">
-        <h1>Create</h1>
-    </div>
 
     <script>
         var formdata = {}
@@ -42,7 +39,10 @@
                     let newSchema = { ...s, values: filteredValues };
                     req_body.push(newSchema);
                 }
-            }   
+            }
+
+            const dateDeveloped = document.getElementById("date-developed").value;
+            const approvalDate = document.getElementById("approval-date").value;
          
 
             const response = await fetch("/api/swms", {
@@ -52,6 +52,9 @@
                 },
                 body: JSON.stringify({
                     projectAddress: document.getElementById("projectAddress").value,
+                    scopeOfWork: document.getElementById("scopeOfWork").value,
+                    dateDeveloped: dateDeveloped ? new Date(dateDeveloped).toISOString() : null,
+                    approvalDate: approvalDate ? new Date(approvalDate).toISOString() : null,
                     tableData: req_body
                 })
             });
@@ -80,14 +83,38 @@
        
 
     </script>
+<div class="swms_wrapper">
+    <div class="header">
+        <h1>Create</h1>
+    </div>
 
     <form id="form">
         <div class="create_swms_card">
             <div class="material-text-field">
-                <input type="text" name="Project Address" id="projectAddress" >
+                <input required type="text" name="Project Address" id="projectAddress" >
                 <label for="projectName">Project Name</label>
             </div>
-
+            
+        </div>
+        <div class="create_swms_card">
+            <div class="material-text-field">
+                <input type="text" name="Scope of Work" id="scopeOfWork" >
+                <label for="scopeOfWork">Scope of Work</label>
+            </div>
+            
+        </div>
+        <div class="create_swms_card">
+            <div class="material-style-input">
+                <input required type="date" id="date-developed" class="date-input">
+                <label for="date-developed" class="date-label">Date Developed</label>
+            </div>
+        </div>
+        
+        <div class="create_swms_card">
+        <div class="material-style-input">
+            <input type="date" id="approval-date" class="date-input">
+            <label for="approval-date" class="date-label">Approval Date</label>
+        </div>
         </div>
     
         {{range .}}
@@ -112,5 +139,6 @@
         <button class="button" type="submit">Create</button>
     </form>
     <div id="swms"></div>
+</div>
 </body>
 </html>

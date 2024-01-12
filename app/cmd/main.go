@@ -26,6 +26,7 @@ func main() {
 
 	// routes for API
 	r.HandleFunc("/api/swms/schema", api.SwmsSchemaHandler).Methods("GET")
+	r.HandleFunc("/api/swms", api.GetSwms).Methods("GET")
 	r.HandleFunc("/api/swms", api.CreateSwms).Methods("POST")
 	r.HandleFunc("/api/swms", api.UpdateFileHandler).Methods("PATCH")
 	r.HandleFunc("/api/login", api.LoginHandler).Methods("POST")

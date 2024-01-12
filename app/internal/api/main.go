@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"example.com/internal/data"
+	"example.com/internal/models"
 	"example.com/internal/repository"
 	"example.com/internal/services"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -20,6 +21,9 @@ func SwmsSchemaHandler(w http.ResponseWriter, r *http.Request) {
 
 type CreateSwmsRequest struct {
 	ProjectAddress string          `json:"projectAddress"`
+	ScopeOfWork    string          `json:"scopeOfWork"`
+	DateDeveloped  string          `json:"dateDeveloped"`
+	ApprovalDate   string          `json:"approvalDate"`
 	TableData      json.RawMessage `json:"tableData"`
 }
 
@@ -85,15 +89,43 @@ func CreateSwms(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type CreatePdfData struct {
+		ProjectAddress string          `json:"projectAddress"`
+		ApprovalDate   string          `json:"approvalDate"`
+		DateDeveloped  string          `json:"dateDeveloped"`
+		ScopeOfWork    string          `json:"scopeOfWork"`
+		TableData      json.RawMessage `json:"tableData"`
+		ABN            string          `json:"abn"`
+		BusinessName   string          `json:"businessName"`
+		BusinessPhone  string          `json:"businessPhone"`
+		BusinessEmail  string          `json:"businessEmail"`
+	}
+
+	org := models.Organisations{}
+
+	org, err = db.GetOrganisation(user.OrganisationID)
+
 	type SwmsRequest struct {
-		Id   int               `json:"id"`
-		Data CreateSwmsRequest `json:"data"`
-		Pdf  string            `json:"pdf"`
+		Id   int           `json:"id"`
+		Data CreatePdfData `json:"data"`
+		Pdf  string        `json:"pdf"`
+	}
+
+	PdfData := CreatePdfData{
+		ProjectAddress: createSwmsRequest.ProjectAddress,
+		ScopeOfWork:    createSwmsRequest.ScopeOfWork,
+		ApprovalDate:   createSwmsRequest.ApprovalDate,
+		DateDeveloped:  createSwmsRequest.DateDeveloped,
+		TableData:      createSwmsRequest.TableData,
+		ABN:            org.ABN,
+		BusinessName:   org.Name,
+		BusinessPhone:  org.BusinessPhone,
+		BusinessEmail:  org.BusinessEmail,
 	}
 
 	body := SwmsRequest{
 		Id:   swmsID,
-		Data: createSwmsRequest,
+		Data: PdfData,
 		Pdf:  "swms",
 	}
 

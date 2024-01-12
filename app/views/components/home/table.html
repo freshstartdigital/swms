@@ -1,0 +1,18 @@
+{{range .}}
+<div class="swms_table">
+    <p class="swms_name">
+        {{.Name}}
+    </p>
+    <p class="swms_type">
+        {{.SwmsType}}
+    </p>
+    <p>
+        {{if .FilePath}}
+            <a href="{{.FilePath}}"><i class="fa-solid fa-download"></i>
+        </a>
+        {{else}}
+            <div class="loader"></div>
+        {{end}}
+    </p>
+</div>
+{{end}}
