@@ -4,9 +4,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"example.com/internal/models"
 	"example.com/internal/repository"
+	"example.com/internal/services"
 )
 
 func RegisterOrgHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +89,17 @@ func RegisterOrgHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
+
+	var sessionToken string
+	sessionToken, err = services.GenerateSessionToken()
+	err = db.CreateSession(sessionToken, userID, r.RemoteAddr)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "swms_session_token",
+		Value:   sessionToken,
+		Expires: time.Now().Add(24 * time.Hour),
+		Path:    "/", // Global path
+	})
 
 	type RegisterOrgPageResponse struct {
 		SubscriptionPlans models.SubscriptionPlans
