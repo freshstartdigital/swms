@@ -12,7 +12,7 @@ func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionI
 	subscriptionPlanID := 0
 
 	err := db.QueryRow(`
-		SELECT organisation_id
+		SELECT id
 		FROM organisations
 		WHERE stripe_customer_id = $1`, CustomerID).
 		Scan(&organisationID)
