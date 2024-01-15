@@ -28,6 +28,10 @@ func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionI
 		Scan(&subscriptionPlanID)
 
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			log.Println("No subscription plan found", PlanID)
+			return err
+		}
 		return err
 	}
 
