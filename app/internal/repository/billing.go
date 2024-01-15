@@ -18,6 +18,7 @@ func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionI
 		Scan(&organisationID)
 
 	if err != nil {
+		log.Println("No organisation found", CustomerID)
 		return err
 	}
 
