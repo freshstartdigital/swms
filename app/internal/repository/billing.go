@@ -245,3 +245,30 @@ func (db *DB) GetSubscriptionByOrgID(ID int) (models.Subscriptions, error) {
 
 	return subscription, nil
 }
+
+func (db *DB) GetAllStripeInvoicesBySubscriptionID(ID int) ([]models.StripeInvoices, error) {
+	var stripeInvoices []models.StripeInvoices
+	rows, err := db.Query(`
+	SELECT id, subscription_id, stripe_invoice_id, stripe_status, stripe_pdf_link
+	FROM stripe_invoices
+	WHERE subscription_id = $1`, ID)
+
+	if err != nil {
+		log.Println("Error querying database:", err)
+		return []models.StripeInvoices{}, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var stripeInvoice models.StripeInvoices
+		err := rows.Scan(&stripeInvoice.ID, &stripeInvoice.SubscriptionID, &stripeInvoice.StripeInvoiceID, &stripeInvoice.StripeStatus, &stripeInvoice.StripePDFLink)
+		if err != nil {
+			log.Println("Error scanning database:", err)
+			return []models.StripeInvoices{}, err
+		}
+		stripeInvoices = append(stripeInvoices, stripeInvoice)
+	}
+
+	return stripeInvoices, nil
+}

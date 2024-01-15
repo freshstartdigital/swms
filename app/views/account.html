@@ -30,6 +30,16 @@
         <p>{{.CurrentPeriodStart}}</p>
         <h4>Billing End</h4>
         <p>{{.CurrentPeriodEnd}}</p>
+        <h4>Stripe URL</h4>
+        <p>{{.Organisation.StripeUrl}}</p>
+
+    </div>
+    <div class="create_swms_card">
+        {{range .StripeInvoices}}
+        <h4>Invoice</h4>
+        <p>{{.StripeStatus}}</p>
+        <p>{{.StripePDFLink}}</p>
+        {{end}}
     </div>
     </div>
 </body>
