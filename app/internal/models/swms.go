@@ -33,6 +33,7 @@ type Swms struct {
 	FileName        *string         `json:"file_name,omitempty"`
 	FilePath        *string         `json:"file_path,omitempty"`
 	UserId          int             `json:"user_id"`
+	OrganisationId  int             `json:"organisation_id"`
 	GeneratorStatus string          `json:"generator_status"`
 	CreatedAt       time.Time       `json:"created_at"`
 	UpdatedAt       time.Time       `json:"updated_at"`

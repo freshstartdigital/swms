@@ -20,11 +20,13 @@ func SwmsSchemaHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type CreateSwmsRequest struct {
-	ProjectAddress string          `json:"projectAddress"`
-	ScopeOfWork    string          `json:"scopeOfWork"`
-	DateDeveloped  string          `json:"dateDeveloped"`
-	ApprovalDate   string          `json:"approvalDate"`
-	TableData      json.RawMessage `json:"tableData"`
+	ProjectAddress   string          `json:"projectAddress"`
+	ScopeOfWork      string          `json:"scopeOfWork"`
+	DateDeveloped    string          `json:"dateDeveloped"`
+	ApprovalDate     string          `json:"approvalDate"`
+	DateLastReviewed string          `json:"dateLastReviewed"`
+	NextReviewDate   string          `json:"nextReviewDate"`
+	TableData        json.RawMessage `json:"tableData"`
 }
 
 func CreateSwms(w http.ResponseWriter, r *http.Request) {
@@ -90,15 +92,17 @@ func CreateSwms(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type CreatePdfData struct {
-		ProjectAddress string          `json:"projectAddress"`
-		ApprovalDate   string          `json:"approvalDate"`
-		DateDeveloped  string          `json:"dateDeveloped"`
-		ScopeOfWork    string          `json:"scopeOfWork"`
-		TableData      json.RawMessage `json:"tableData"`
-		ABN            string          `json:"abn"`
-		BusinessName   string          `json:"businessName"`
-		BusinessPhone  string          `json:"businessPhone"`
-		BusinessEmail  string          `json:"businessEmail"`
+		ProjectAddress   string          `json:"projectAddress"`
+		ApprovalDate     string          `json:"approvalDate"`
+		DateDeveloped    string          `json:"dateDeveloped"`
+		DateLastReviewed string          `json:"dateLastReviewed"`
+		NextReviewDate   string          `json:"nextReviewDate"`
+		ScopeOfWork      string          `json:"scopeOfWork"`
+		TableData        json.RawMessage `json:"tableData"`
+		ABN              string          `json:"abn"`
+		BusinessName     string          `json:"businessName"`
+		BusinessPhone    string          `json:"businessPhone"`
+		BusinessEmail    string          `json:"businessEmail"`
 	}
 
 	org := models.Organisations{}
@@ -112,15 +116,17 @@ func CreateSwms(w http.ResponseWriter, r *http.Request) {
 	}
 
 	PdfData := CreatePdfData{
-		ProjectAddress: createSwmsRequest.ProjectAddress,
-		ScopeOfWork:    createSwmsRequest.ScopeOfWork,
-		ApprovalDate:   createSwmsRequest.ApprovalDate,
-		DateDeveloped:  createSwmsRequest.DateDeveloped,
-		TableData:      createSwmsRequest.TableData,
-		ABN:            org.ABN,
-		BusinessName:   org.Name,
-		BusinessPhone:  org.BusinessPhone,
-		BusinessEmail:  org.BusinessEmail,
+		ProjectAddress:   createSwmsRequest.ProjectAddress,
+		ScopeOfWork:      createSwmsRequest.ScopeOfWork,
+		ApprovalDate:     createSwmsRequest.ApprovalDate,
+		DateDeveloped:    createSwmsRequest.DateDeveloped,
+		DateLastReviewed: createSwmsRequest.DateLastReviewed,
+		NextReviewDate:   createSwmsRequest.NextReviewDate,
+		TableData:        createSwmsRequest.TableData,
+		ABN:              org.ABN,
+		BusinessName:     org.Name,
+		BusinessPhone:    org.BusinessPhone,
+		BusinessEmail:    org.BusinessEmail,
 	}
 
 	body := SwmsRequest{

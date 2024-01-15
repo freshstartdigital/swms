@@ -8,9 +8,12 @@ import (
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
-func (db *DB) GetAllSwms() ([]models.Swms, error) {
-	rows, err := db.Query("SELECT id, user_id, name, swms_type, generator_status, file_name, file_path, created_at, updated_at, swms_data FROM swms ORDER BY created_at DESC")
+func (db *DB) GetAllSwms(OrganisationID int) ([]models.Swms, error) {
+
+	rows, err := db.Query("SELECT id, user_id, name, swms_type, generator_status, file_name, file_path, created_at, updated_at, swms_data FROM swms WHERE organisation_id = $1", OrganisationID)
+
 	if err != nil {
+		log.Printf("Error getting all swms: %v", err)
 		return nil, err
 	}
 
@@ -33,7 +36,7 @@ func (db *DB) CreateSwms(user models.Users, name string, SwmsData json.RawMessag
 
 	var swmsID int
 
-	stmt, err := db.Prepare("INSERT INTO swms (user_id, name, swms_type, swms_data) VALUES ($1, $2, $3, $4) RETURNING id")
+	stmt, err := db.Prepare("INSERT INTO swms (user_id, organisation_id, name, swms_type, swms_data) VALUES ($1, $2, $3, $4, $5) RETURNING id")
 	if err != nil {
 		return 0, err
 	}
@@ -41,6 +44,7 @@ func (db *DB) CreateSwms(user models.Users, name string, SwmsData json.RawMessag
 
 	err = stmt.QueryRow(
 		user.ID,
+		user.OrganisationID,
 		name,
 		SwmsType,
 		SwmsData,

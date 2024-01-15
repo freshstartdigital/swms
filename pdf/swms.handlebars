@@ -22,7 +22,8 @@
       black; padding: 5px; } /* Ensure headers and footers appear on each page */ @media print {
       .header, .footer { position: fixed; left: 0; right: 0; } .header { top: 0; } .footer { bottom:
       0; } } .font-bold { font-weight: bold; font-size: 12px; } .font-regular { font-weight: normal;
-      font-size: 12px; } td { vertical-align: top; }
+      font-size: 12px; } td { vertical-align: top; } .dot_point_table {display: flex; border: 1px
+      solid black;} .dot_points {flex: 1} .dot_points2 {flex: 2}
 
     </style>
   </head>
@@ -53,7 +54,7 @@
           </div>
           <div class='sub-container'>
             <p class='container-label'>Business Phone #:</p>
-            <p class='container-content'>{{abn}}</p>
+            <p class='container-content'>{{businessPhone}}</p>
           </div>
 
         </div>
@@ -134,8 +135,8 @@
             <p class='container-content'>{{approvalDate}}</p>
           </div>
           <div class='sub-container'>
-            <p class='container-label'>Reviewed &amp; Approved for Use by::</p>
-            <p class='container-content'>{{email}}</p>
+            <p class='container-label'>Reviewed &amp; Approved for Use by:</p>
+            <p class='container-content'>{{businessName}}</p>
           </div>
         </div>
         <br />
@@ -176,6 +177,87 @@
       <footer>
         <p>Page 1 of 1</p>
       </footer>
+    </div>
+    <div class='page'>
+      <h4>Supplementary Information</h4>
+      <h6>Plant | Equipment Involved</h6>
+      <ol>
+        <li>All items are inspected prior to use | all corded electrical power tools tested & tagged
+          to AS/NZS 3760</li>
+        <li>Maintenance & servicing records are maintained for plant and equipment owned by Fresh
+          Start Projects Pty Ltd</li>
+        <li>Maintenance & servicing records for hire or contractor items are maintained by the
+          respective hirer and contractor</li>
+      </ol>
+      <h6>Qualifications | Certificates of Competency | Experience | Training | High Risk Licences</h6>
+      <ul>
+        <li>General Construction Induction (White Card)</li>
+        <li>Builder / PC Site Induction</li>
+        <li>Pre-Start | Toolbox Meeting</li>
+        <li>SWMS | JSEA Induction</li>
+      </ul>
+      <h6>Reference Relevant Legislation | Codes of Practice / Compliance Codes | Australian
+        Standards
+      </h6>
+      <div class='dot_point_table'>
+        <div class='dot_points'>
+          <ul>
+            <li>WHS Act 2011</li>
+            <li>Environmental Protection Act 1994</li>
+            <li>Workers Compensation and Rehabilitation Act 2003</li>
+            <li>Electrical Safety Regulation</li>
+            <li>Plant Code of Practice 2013</li>
+            <li>Formwork Code of Practice 2016</li>
+            <li>Scaffolding Code of Practice 2009</li>
+            <li>2011 AS/NZS 31000 Risk Management</li>
+            <li>Hazardous Manual Tasks Code of Practice 2011</li>
+          </ul>
+        </div>
+        <div class='dot_points2'>
+          <ul>
+            <li>WHS Regulations 2011</li>
+            <li>Environmental Protection Regulation 2008</li>
+            <li>Workers' Compensation and Rehabilitation Regulation 2014</li>
+            <li>Division 6 WHS Regulation Section 368. PCBU duty to provide the health monitoring
+              for RCS.</li>
+            <li>Silica Dust - Managing exposure in the workplace 2019 – Inclusion of Stone Bench
+              Tops</li>
+            <li>Fit Testing Process AS/NZS1715 (Respiratory Protection)</li>
+            <li>Managing the Risk of Falls at Workplaces Code of Practice 2018</li>
+            <li>AS/NZS 3760:2010 In-Service safety inspection & testing of electrical equipment.</li>
+            <li>Electrical Safety COP 2013 - Managing electrical risk in the workplace.</li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+    <div class='page'>
+      <h6>Reference Relevant Legislation | Codes of Practice / Compliance Codes | Australian
+        Standards (Cont.)
+      </h6>
+      <div class='dot_point_table'>
+        <div class='dot_points'>
+          <ul>
+            <li>Confined Spaces Code of Practice 2011</li>
+            <li>First Aid Code of Practice 2014</li>
+            <li>AS/NZS 1892 Portable Ladders.</li>
+            <li>AS/NZS 1657 Fixed Ladders</li>
+            <li>Hazardous Chemicals Code of Practice 2013</li>
+            <li>How to Safely Remove Asbestos Code of Practice 2011</li>
+          </ul>
+        </div>
+        <div class='dot_points2'>
+          <ul>
+            <li>AS/NZS 3012:2010 Electrical Installations</li>
+            <li>Traffic Management for Construction or Maintenance Work Code of Practice 2008</li>
+            <li>How to Manage Work Health and Safety Risks Code of Practice 2011</li>
+            <li>Managing Noise and Preventing Hearing Loss at Work COP 2011</li>
+            <li>How to Manage and Control Asbestos in the Workplace Code of Practice 2011 NOHSC
+              (2005) 2018</li>
+            <li>Work Health and Safety Consultation, Co-operation and Co-ordination 2011</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <!-- Start of dynamic table on page 2 -->

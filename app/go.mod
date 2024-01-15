@@ -9,4 +9,5 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
+	github.com/stripe/stripe-go/v72 v72.122.0 // indirect
 )

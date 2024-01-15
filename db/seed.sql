@@ -16,6 +16,8 @@ CREATE TABLE organisations
   business_phone VARCHAR(255) NOT NULL DEFAULT '',
   business_email VARCHAR(255) NOT NULL DEFAULT '',
   logo_file_name VARCHAR(255) NOT NULL DEFAULT '',
+  stripe_customer_id VARCHAR(255) NOT NULL DEFAULT '',
+  stripe_url VARCHAR(255) NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   account_holder_id INTEGER,
@@ -39,6 +41,7 @@ CREATE TABLE swms
 (
   id SERIAL,
   user_id INTEGER REFERENCES users(id),
+  organisation_id INTEGER REFERENCES organisations(id),
   name VARCHAR(255) NOT NULL,
   swms_type VARCHAR(255) NOT NULL,
   generator_status VARCHAR(255) NOT NULL DEFAULT 'loading',
@@ -62,27 +65,39 @@ CREATE TABLE sessions
   UNIQUE(session_token)
 );
 
-CREATE TABLE licence_keys
-(
-  id SERIAL,
-  organisation_id INTEGER,
-  licence_key VARCHAR(255) NOT NULL,
-  key_status VARCHAR(255) NOT NULL DEFAULT 'active',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (id),
-  UNIQUE(licence_key)
-);
-
-CREATE TABLE subscription_plan
+CREATE TABLE subscription_plans
 (
   id SERIAL,
   stripe_plan_id VARCHAR(255),
+  stripe_payment_link VARCHAR(255),
   description VARCHAR(255),
   price INTEGER,
   duration VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE subscriptions
+(
+  id SERIAL,
+  organisation_id INTEGER REFERENCES organisations(id),
+  subscription_plan_id INTEGER REFERENCES subscription_plans(id),
+  stripe_subscription_id VARCHAR(255),
+  current_period_start INTEGER NOT NULL,
+  current_period_end INTEGER NOT NULL,
+  stripe_status VARCHAR(255),
+  cancelled_at INTEGER,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE stripe_invoices
+(
+  id SERIAL,
+  subscription_id INTEGER REFERENCES subscriptions(id),
+  stripe_invoice_id VARCHAR(255),
+  stripe_status VARCHAR(255),
+  stripe_pdf_link VARCHAR(255),
   PRIMARY KEY (id)
 );
 
@@ -124,8 +139,6 @@ VALUES ('USER', 'User');
 INSERT INTO organisations (name, account_holder_id, organisation_type_id, business_address, abn, business_phone, business_email)  
 VALUES ('Fresh Start Project', 1, 1, '2/15 Montague Street, Stones Corner, QLD 4120', '52 648 576 390', '1300 980 999', 'george.frilingos@freshstart.edu.au');
 
-INSERT INTO licence_keys (organisation_id, licence_key)
-VALUES (1, '1234567890');
 
 -- Insert users
 INSERT INTO users (organisation_id, password, email, name)
@@ -136,4 +149,8 @@ VALUES (1, 'password', 'justin.keating@droneanalytics.com.au', 'Justin Keating')
 
 INSERT INTO users (organisation_id, password, email, name)
 VALUES (1, 'password', 'george.frilingos@freshstartprojects.com.au', 'George Frilingos');
+
+-- Insert subscription plans
+INSERT INTO subscription_plans (stripe_plan_id, stripe_payment_link, description, price, duration)
+VALUES ('prod_PMNAB3HqlD1F8e', 'https://buy.stripe.com/test_3cs16Q6e4fGefVSbII', 'Monthly Subscription', 5000, 'month');
 

@@ -48,8 +48,8 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, banned) // Execute with nil or appropriate context
 		return
 	}
-
-	_, err = services.Authenticate(r)
+	var user models.Users
+	user, err = services.Authenticate(r)
 
 	if err != nil {
 		tmpl, err = template.ParseFiles("views/unauthenticated.html")
@@ -71,7 +71,7 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	swms, err := db.GetAllSwms()
+	swms, err := db.GetAllSwms(user.OrganisationID)
 	if err != nil {
 		log.Printf("Error getting all swms: %v", err)
 

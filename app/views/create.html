@@ -3,86 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Styled Hello World</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/styles.css">    
+    <script src="/static/script.js"></script>
+    <script src="/static/components.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
-
-    <script>
-        var formdata = {}
-        var schema_data = []
-
-        function updateSchemaData(parentId, subId, bool) {
-            const schema = schema_data.find((schema) => schema.id == parentId);
-            const subSchema = schema.values.find((subSchema) => subSchema.subId == subId);
-            subSchema.checked = bool;
-        }
-
-        const changehandler = (checkbox) => {
-            const parentId = checkbox.value.split("-")[0];
-            const subId = checkbox.value.split("-")[1];
-            if (checkbox.checked) {
-                updateSchemaData(parentId, subId, true);
-            } else {
-                updateSchemaData(parentId, subId, false);   
-            }
-        }
-
-        const submitHandler = async (e) => {
-            e.preventDefault();
-            console.log(schema_data);
-
-            const req_body = [];
-            for (const s of schema_data) {
-                const filteredValues = s.values.filter(v => v.checked);
-                if (filteredValues.length > 0) {
-                    let newSchema = { ...s, values: filteredValues };
-                    req_body.push(newSchema);
-                }
-            }
-
-            const dateDeveloped = document.getElementById("date-developed").value;
-            const approvalDate = document.getElementById("approval-date").value;
-         
-
-            const response = await fetch("/api/swms", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    projectAddress: document.getElementById("projectAddress").value,
-                    scopeOfWork: document.getElementById("scopeOfWork").value,
-                    dateDeveloped: dateDeveloped ? new Date(dateDeveloped).toISOString() : null,
-                    approvalDate: approvalDate ? new Date(approvalDate).toISOString() : null,
-                    tableData: req_body
-                })
-            });
-            if (response.ok) {
-                //redirect to home page
-                window.location.href = "/";
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", async function(event) {
-            console.log('is running')
-            var response = await fetch("/api/swms/schema");
-            if (response.ok) {
-                var data = await response.json();
-                if (Array.isArray(data)) {
-                    schema_data = data;
-              
-                }
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", function(event) {
-            document.getElementById("form").addEventListener("submit", submitHandler);
-        });
-
-       
-
-    </script>
+<navigation-bar page="create"></navigation-bar>
 <div class="swms_wrapper">
     <div class="header">
         <h1>Create</h1>
@@ -98,14 +25,14 @@
         </div>
         <div class="create_swms_card">
             <div class="material-text-field">
-                <input type="text" name="Scope of Work" id="scopeOfWork" >
+                <input required type="text" name="Scope of Work" id="scopeOfWork" >
                 <label for="scopeOfWork">Scope of Work</label>
             </div>
             
         </div>
         <div class="create_swms_card">
             <div class="material-style-input">
-                <input required type="date" id="date-developed" class="date-input">
+                <input  type="date" id="date-developed" class="date-input">
                 <label for="date-developed" class="date-label">Date Developed</label>
             </div>
         </div>
@@ -114,6 +41,18 @@
         <div class="material-style-input">
             <input type="date" id="approval-date" class="date-input">
             <label for="approval-date" class="date-label">Approval Date</label>
+        </div>
+        </div>
+        <div class="create_swms_card">
+        <div class="material-style-input">
+            <input type="date" id="date-last-reviewed" class="date-input">
+            <label for="date-last-reviewed" class="date-label">Date Last Reviewed</label>
+        </div>
+        </div>
+        <div class="create_swms_card">
+        <div class="material-style-input">
+            <input type="date" id="next-review-date" class="date-input">
+            <label for="next-review-date" class="date-label">Next Review Date</label>
         </div>
         </div>
     

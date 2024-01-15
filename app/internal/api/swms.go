@@ -19,7 +19,9 @@ func GetSwms(w http.ResponseWriter, r *http.Request) {
 
 	defer db.Close()
 
-	swms, err = db.GetAllSwms()
+	user, err := services.Authenticate(r)
+
+	swms, err = db.GetAllSwms(user.OrganisationID)
 
 	if err != nil {
 		// Log the error and return

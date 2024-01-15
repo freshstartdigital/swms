@@ -18,6 +18,8 @@ type Organisations struct {
 	CreatedAt        string             `json:"created_at"`
 	UpdatedAt        string             `json:"updated_at"`
 	AccountHolderID  *int               `json:"account_holder_id"`
+	StripeCustomerID string             `json:"stripe_customer_id"`
+	StripeUrl        string             `json:"stripe_url"`
 }
 
 type Users struct {

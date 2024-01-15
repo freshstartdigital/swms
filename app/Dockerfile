@@ -41,7 +41,10 @@ COPY --from=builder /app/main .
 RUN rm -rf /root/static /root/views
 
 # Copy static assets from the builder stage
+
 COPY ./static/styles.css /root/static/styles.css
+COPY ./static/script.js /root/static/script.js
+COPY ./static/components.js /root/static/components.js
 COPY ./views /root/views
 
 # Set the binary as the entrypoint of the container

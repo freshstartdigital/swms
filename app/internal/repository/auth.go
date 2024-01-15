@@ -136,3 +136,78 @@ func (db *DB) CreateLoginAttempt(ipAddress string) (int, error) {
 
 	return numberOfAttempts, nil
 }
+
+func (db *DB) GetOrganisationByUserEmail(email string) (models.Organisations, error) {
+	var organisation models.Organisations
+	var organisationType models.OrganisationTypes
+	err := db.QueryRow(`
+		SELECT
+			org.id, org.name, org.business_address, org.abn, org.business_phone, 
+			org.business_email, org.logo_file_name, org.created_at, org.updated_at, 
+			org.account_holder_id, org_type.id, org_type.type, org_type.display_name 
+		FROM organisations org
+		JOIN organisation_types org_type ON org.organisation_type_id = org_type.id
+		JOIN users u ON org.id = u.organisation_id
+		WHERE u.email = $1`, email).
+		Scan(&organisation.ID, &organisation.Name, &organisation.BusinessAddress, &organisation.ABN,
+			&organisation.BusinessPhone, &organisation.BusinessEmail, &organisation.LogoFileName,
+			&organisation.CreatedAt, &organisation.UpdatedAt, &organisation.AccountHolderID,
+			&organisationType.ID, &organisationType.Type, &organisationType.DisplayName)
+
+	if err != nil {
+		return models.Organisations{}, err
+	}
+	organisation.OrganisationType = &organisationType
+	return organisation, nil
+}
+
+func (db *DB) UpdateOrganisationStripeData(orgID int, StripeCustomerID string, StripeUrl string) error {
+	_, err := db.Exec(`
+		UPDATE organisations 
+		SET stripe_customer_id = $1, stripe_url = $2 
+		WHERE id = $3`, StripeCustomerID, StripeUrl, orgID)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DB) CreateOrganisation(name string) (int, error) {
+	var organisationID int
+	err := db.QueryRow(`
+		INSERT INTO organisations (name)
+		VALUES ($1)
+		RETURNING id`, name).Scan(&organisationID)
+
+	if err != nil {
+		return 0, err
+	}
+	return organisationID, nil
+}
+
+func (db *DB) CreateUser(name string, email string, password string, organisationID int) (int, error) {
+
+	var userID int
+	err := db.QueryRow(`
+		INSERT INTO users (name, email, password, organisation_id)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id`, name, email, password, organisationID).Scan(&userID)
+
+	if err != nil {
+		return 0, err
+	}
+	return userID, nil
+}
+
+func (db *DB) UpdateAccountHolderID(userID int, organisationID int) error {
+	_, err := db.Exec(`
+		UPDATE organisations 
+		SET account_holder_id = $1
+		WHERE id = $2`, userID, organisationID)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
