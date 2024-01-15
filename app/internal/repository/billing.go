@@ -184,3 +184,64 @@ func (db *DB) GetSubscriptionPlanByID(ID int) (models.SubscriptionPlans, error) 
 
 	return subscriptionPlan, nil
 }
+
+func (db *DB) UpdateStripeInvoiceAndSubscriptions(SubscriptionID string, Status string, CurrentPeriodStart int64, CurrentPeriodEnd int64) error {
+	stmt, err := db.Prepare(`
+	UPDATE stripe_invoices
+	SET stripe_status = $1
+	WHERE stripe_invoice_id = $2
+	`)
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		Status,
+		SubscriptionID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	stmt, err = db.Prepare(`
+	UPDATE subscriptions
+	SET stripe_status = $1, current_period_start = $2, current_period_end = $3
+	WHERE stripe_subscription_id = $4
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		Status,
+		CurrentPeriodStart,
+		CurrentPeriodEnd,
+		SubscriptionID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *DB) GetSubscriptionByOrgID(ID int) (models.Subscriptions, error) {
+	var subscription models.Subscriptions
+	err := db.QueryRow(`
+	SELECT id, organisation_id, subscription_plan_id, stripe_subscription_id, stripe_status, current_period_start, current_period_end, cancelled_at
+	FROM subscriptions
+	WHERE organisation_id = $1`, ID).
+		Scan(&subscription.ID, &subscription.OrganisationID, &subscription.SubscriptionPlanID, &subscription.StripeSubscriptionID, &subscription.StripeStatus, &subscription.CurrentPeriodStart, &subscription.CurrentPeriodEnd, &subscription.CancelledAt)
+
+	if err != nil {
+		log.Println("Error querying database:", err)
+		return models.Subscriptions{}, err
+	}
+
+	return subscription, nil
+}

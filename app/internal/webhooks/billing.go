@@ -66,6 +66,12 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			}
 		} else {
 			organisation, err = db.GetOrganisationByUserEmail(customerCreated.Email)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error getting organisation: %v\n", err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
 		}
 
 		if organisation.StripeCustomerID != "" {
@@ -197,18 +203,75 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		err = db.UpdateInvoice(
+		err = db.UpdateStripeInvoiceAndSubscriptions(
 			invoicePaid.ID,
 			invoicePaid.Status,
+			invoicePaid.Lines.Data[0].Period.Start,
+			invoicePaid.Lines.Data[0].Period.End,
 		)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error updating invoice: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error updating subscription: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	case "invoice.updated":
+		type InvoicePaid struct {
+			Status string `json:"status"`
+			ID     string `json:"id"`
+			Lines  struct {
+				Data []struct {
+					Period struct {
+						Start int64 `json:"start"`
+						End   int64 `json:"end"`
+					} `json:"period"`
+				} `json:"data"`
+			} `json:"lines"`
+		}
+
+		var invoicePaid InvoicePaid
+		err := json.Unmarshal(stripe_data, &invoicePaid)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		err = db.UpdateSubscription(
+		err = db.UpdateStripeInvoiceAndSubscriptions(
+			invoicePaid.ID,
+			invoicePaid.Status,
+			invoicePaid.Lines.Data[0].Period.Start,
+			invoicePaid.Lines.Data[0].Period.End,
+		)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error updating subscription: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	case "invoice.payment_succeeded":
+		type InvoicePaid struct {
+			Status string `json:"status"`
+			ID     string `json:"id"`
+			Lines  struct {
+				Data []struct {
+					Period struct {
+						Start int64 `json:"start"`
+						End   int64 `json:"end"`
+					} `json:"period"`
+				} `json:"data"`
+			} `json:"lines"`
+		}
+
+		var invoicePaid InvoicePaid
+		err := json.Unmarshal(stripe_data, &invoicePaid)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = db.UpdateStripeInvoiceAndSubscriptions(
 			invoicePaid.ID,
 			invoicePaid.Status,
 			invoicePaid.Lines.Data[0].Period.Start,

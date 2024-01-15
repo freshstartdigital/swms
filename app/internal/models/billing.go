@@ -17,8 +17,8 @@ type Subscriptions struct {
 	SubscriptionPlanID   int     `json:"subscription_plan_id"`
 	StripeSubscriptionID string  `json:"stripe_subscription_id"`
 	StripeStatus         string  `json:"stripe_status"`
-	CurrentPeriodStart   string  `json:"current_period_start"`
-	CurrentPeriodEnd     string  `json:"current_period_end"`
+	CurrentPeriodStart   int64   `json:"current_period_start"`
+	CurrentPeriodEnd     int64   `json:"current_period_end"`
 	CancelledAt          *string `json:"cancelled_at"`
 }
 
