@@ -25,6 +25,7 @@ func main() {
 	r.HandleFunc("/create", controllers.CreatePageHandler).Methods("GET")
 	r.HandleFunc("/login", controllers.GetLoginHandler).Methods("GET")
 	r.HandleFunc("/register", controllers.RegisterHandler).Methods("GET")
+	r.HandleFunc("/account", controllers.AccountHandler).Methods("GET")
 
 	// routes for API
 	r.HandleFunc("/api/swms/schema", api.SwmsSchemaHandler).Methods("GET")
