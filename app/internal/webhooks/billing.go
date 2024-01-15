@@ -89,10 +89,12 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			SubscriptionID     string `json:"id"`
 			CurrentPeriodStart int64  `json:"current_period_start"`
 			CurrentPeriodEnd   int64  `json:"current_period_end"`
-			Items              []struct {
-				Plan struct {
-					ProductID string `json:"product"`
-				} `json:"plan"`
+			Items              struct {
+				Data []struct {
+					Plan struct {
+						ProductID string `json:"product"`
+					} `json:"plan"`
+				} `json:"data"`
 			} `json:"items"`
 		}
 
@@ -108,7 +110,7 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			customerSubscriptionCreated.CustomerID,
 			customerSubscriptionCreated.Status,
 			customerSubscriptionCreated.SubscriptionID,
-			customerSubscriptionCreated.Items[0].Plan.ProductID,
+			customerSubscriptionCreated.Items.Data[0].Plan.ProductID,
 			customerSubscriptionCreated.CurrentPeriodStart,
 			customerSubscriptionCreated.CurrentPeriodEnd,
 		)
