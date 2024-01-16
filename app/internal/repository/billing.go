@@ -6,10 +6,10 @@ import (
 	"example.com/internal/models"
 )
 
-func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionID string, PlanID string, CurrentPeriodStart int64, CurrentPeriodEnd int64) error {
+func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionID string, ProductID string, CurrentPeriodStart int64, CurrentPeriodEnd int64) error {
 
 	organisationID := 0
-	subscriptionPlanID := 0
+	subscriptionProductID := 0
 
 	err := db.QueryRow(`
 		SELECT id
@@ -25,12 +25,12 @@ func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionI
 	err = db.QueryRow(`
 		SELECT id
 		FROM subscription_plans
-		WHERE stripe_plan_id = $1`, PlanID).
-		Scan(&subscriptionPlanID)
+		WHERE stripe_product_id = $1`, ProductID).
+		Scan(&subscriptionProductID)
 
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			log.Println("No subscription plan found", PlanID)
+			log.Println("No subscription plan found", subscriptionProductID)
 			return err
 		}
 		return err
@@ -46,7 +46,7 @@ func (db *DB) CreateSubscription(CustomerID string, Status string, SubscriptionI
 		organisationID,
 		Status,
 		SubscriptionID,
-		subscriptionPlanID,
+		subscriptionProductID,
 		CurrentPeriodStart,
 		CurrentPeriodEnd,
 	)
@@ -113,10 +113,10 @@ func (db *DB) UpdateSubscription(SubscriptionID string, Status string, CurrentPe
 func (db *DB) GetSubscriptionPlanByID(ID int) (models.SubscriptionPlans, error) {
 	var subscriptionPlan models.SubscriptionPlans
 	err := db.QueryRow(`
-    SELECT id, stripe_plan_id, stripe_payment_link, description, price, duration, created_at, updated_at
+    SELECT id, stripe_product_id, stripe_payment_link, name, description, price, created_at, updated_at
     FROM subscription_plans
     WHERE id = $1`, ID).
-		Scan(&subscriptionPlan.ID, &subscriptionPlan.StripePlanId, &subscriptionPlan.StripePaymentLink, &subscriptionPlan.Description, &subscriptionPlan.Price, &subscriptionPlan.Duration, &subscriptionPlan.CreatedAt, &subscriptionPlan.UpdatedAt)
+		Scan(&subscriptionPlan.ID, &subscriptionPlan.StripeProductId, &subscriptionPlan.StripePaymentLink, &subscriptionPlan.Name, &subscriptionPlan.Description, &subscriptionPlan.Price, &subscriptionPlan.CreatedAt, &subscriptionPlan.UpdatedAt)
 
 	if err != nil {
 		log.Println("Error querying database:", err)

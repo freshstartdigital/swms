@@ -68,11 +68,11 @@ CREATE TABLE sessions
 CREATE TABLE subscription_plans
 (
   id SERIAL,
-  stripe_plan_id VARCHAR(255),
+  stripe_product_id VARCHAR(255) NOT NULL,
   stripe_payment_link VARCHAR(255),
-  description VARCHAR(255),
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(255) NOT NUL,
   price INTEGER NOT NULL DEFAULT 0,
-  duration VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id)
@@ -141,7 +141,4 @@ VALUES (1, 'password', 'justin.keating@droneanalytics.com.au', 'Justin Keating')
 INSERT INTO users (organisation_id, password, email, name)
 VALUES (1, 'password', 'george.frilingos@freshstartprojects.com.au', 'George Frilingos');
 
--- Insert subscription plans
-INSERT INTO subscription_plans (stripe_plan_id, stripe_payment_link, description, price, duration)
-VALUES ('prod_PMNAB3HqlD1F8e', 'https://buy.stripe.com/test_3cs16Q6e4fGefVSbII', 'Monthly Subscription', 5000, 'month');
 

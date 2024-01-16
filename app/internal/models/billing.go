@@ -2,11 +2,11 @@ package models
 
 type SubscriptionPlans struct {
 	ID                int    `json:"id"`
-	StripePlanId      string `json:"stripe_plan_id"`
+	StripeProductId   string `json:"stripe_product_id"`
 	StripePaymentLink string `json:"stripe_payment_link"`
+	Name              string `json:"name"`
 	Description       string `json:"description"`
 	Price             int    `json:"price"`
-	Duration          string `json:"duration"`
 	CreatedAt         string `json:"created_at"`
 	UpdatedAt         string `json:"updated_at"`
 }
