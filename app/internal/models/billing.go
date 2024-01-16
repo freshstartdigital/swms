@@ -21,11 +21,3 @@ type Subscriptions struct {
 	CurrentPeriodEnd     int64   `json:"current_period_end"`
 	CancelledAt          *string `json:"cancelled_at"`
 }
-
-type StripeInvoices struct {
-	ID              int    `json:"id"`
-	SubscriptionID  int    `json:"subscription_id"`
-	StripeInvoiceID string `json:"stripe_invoice_id"`
-	StripeStatus    string `json:"stripe_status"`
-	StripePDFLink   string `json:"stripe_pdf_link"`
-}

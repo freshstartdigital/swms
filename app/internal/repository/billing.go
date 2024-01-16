@@ -83,65 +83,6 @@ func (db *DB) CreateCancelledAtSubscription(SubscriptionID string, CancelledAt i
 	return nil
 }
 
-func (db *DB) CreateInvoice(SubscriptionID string, StripeInvoiceID string, StripeStatus string, StripePDFLink string) error {
-	var subscriptionID int
-
-	err := db.QueryRow(`
-		SELECT id
-		FROM subscriptions
-		WHERE stripe_subscription_id = $1`, SubscriptionID).
-		Scan(&subscriptionID)
-
-	if err != nil {
-		return err
-	}
-
-	stmt, err := db.Prepare("INSERT INTO stripe_invoices (subscription_id, stripe_invoice_id, stripe_status, stripe_pdf_link) VALUES ($1, $2, $3, $4)")
-	if err != nil {
-		return err
-	}
-
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		subscriptionID,
-		StripeInvoiceID,
-		StripeStatus,
-		StripePDFLink,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *DB) UpdateInvoice(ID string, status string) error {
-
-	stmt, err := db.Prepare(`
-		UPDATE stripe_invoices
-		SET stripe_status = $1
-		WHERE stripe_invoice_id = $2
-		`)
-
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		status,
-		ID,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (db *DB) UpdateSubscription(SubscriptionID string, Status string, CurrentPeriodStart int64, CurrentPeriodEnd int64) error {
 
 	stmt, err := db.Prepare(`
@@ -185,51 +126,6 @@ func (db *DB) GetSubscriptionPlanByID(ID int) (models.SubscriptionPlans, error) 
 	return subscriptionPlan, nil
 }
 
-func (db *DB) UpdateStripeInvoiceAndSubscriptions(SubscriptionID string, Status string, CurrentPeriodStart int64, CurrentPeriodEnd int64) error {
-	stmt, err := db.Prepare(`
-	UPDATE stripe_invoices
-	SET stripe_status = $1
-	WHERE stripe_invoice_id = $2
-	`)
-
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		Status,
-		SubscriptionID,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	stmt, err = db.Prepare(`
-	UPDATE subscriptions
-	SET stripe_status = $1, current_period_start = $2, current_period_end = $3
-	WHERE stripe_subscription_id = $4
-	`)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		Status,
-		CurrentPeriodStart,
-		CurrentPeriodEnd,
-		SubscriptionID,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (db *DB) GetSubscriptionByOrgID(ID int) (models.Subscriptions, error) {
 	var subscription models.Subscriptions
 	err := db.QueryRow(`
@@ -246,29 +142,70 @@ func (db *DB) GetSubscriptionByOrgID(ID int) (models.Subscriptions, error) {
 	return subscription, nil
 }
 
-func (db *DB) GetAllStripeInvoicesBySubscriptionID(ID int) ([]models.StripeInvoices, error) {
-	var stripeInvoices []models.StripeInvoices
-	rows, err := db.Query(`
-	SELECT id, subscription_id, stripe_invoice_id, stripe_status, stripe_pdf_link
-	FROM stripe_invoices
-	WHERE subscription_id = $1`, ID)
+func (db *DB) CreateProduct(ProductID string, name string, description string) error {
+	stmt, err := db.Prepare("INSERT INTO subscription_plans (stripe_product_id, name, description) VALUES ($1, $2, $3)")
+	if err != nil {
+		log.Println("Error preparing statement:", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		ProductID,
+		name,
+		description,
+	)
 
 	if err != nil {
-		log.Println("Error querying database:", err)
-		return []models.StripeInvoices{}, err
+		log.Println("Error executing statement:", err)
+		return err
+	}
+	return nil
+}
+
+func (db *DB) UpdateSubscriptionPricing(ID string, price int) error {
+	stmt, err := db.Prepare(`
+		UPDATE subscription_plans
+		SET price = $1
+		WHERE stripe_product_id = $2
+		`)
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		price,
+		ID,
+	)
+
+	if err != nil {
+		return err
 	}
 
-	defer rows.Close()
+	return nil
+}
 
-	for rows.Next() {
-		var stripeInvoice models.StripeInvoices
-		err := rows.Scan(&stripeInvoice.ID, &stripeInvoice.SubscriptionID, &stripeInvoice.StripeInvoiceID, &stripeInvoice.StripeStatus, &stripeInvoice.StripePDFLink)
-		if err != nil {
-			log.Println("Error scanning database:", err)
-			return []models.StripeInvoices{}, err
-		}
-		stripeInvoices = append(stripeInvoices, stripeInvoice)
+func (db *DB) UpdateStripePaymentLink(ID string, link string) error {
+	stmt, err := db.Prepare(`
+		UPDATE subscription_plans
+		SET stripe_payment_link = $1
+		WHERE stripe_product_id = $2
+		`)
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		link,
+		ID,
+	)
+
+	if err != nil {
+		return err
 	}
 
-	return stripeInvoices, nil
+	return nil
 }

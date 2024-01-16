@@ -61,15 +61,12 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stripeInvoices, err := db.GetAllStripeInvoicesBySubscriptionID(subscriptions.ID)
-
 	currentPeriodStart := time.Unix(subscriptions.CurrentPeriodStart, 0).Format("02/01/2006")
 	currentPeriodEnd := time.Unix(subscriptions.CurrentPeriodEnd, 0).Format("02/01/2006")
 
 	type AccountPageResponse struct {
 		User               models.Users
 		Organisation       models.Organisations
-		StripeInvoices     []models.StripeInvoices
 		CurrentPeriodEnd   string
 		CurrentPeriodStart string
 	}
@@ -79,7 +76,6 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		Organisation:       organisation,
 		CurrentPeriodEnd:   currentPeriodEnd,
 		CurrentPeriodStart: currentPeriodStart,
-		StripeInvoices:     stripeInvoices,
 	}
 
 	tmpl, err = template.ParseFiles("views/account.html")

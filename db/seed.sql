@@ -71,7 +71,7 @@ CREATE TABLE subscription_plans
   stripe_plan_id VARCHAR(255),
   stripe_payment_link VARCHAR(255),
   description VARCHAR(255),
-  price INTEGER,
+  price INTEGER NOT NULL DEFAULT 0,
   duration VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -91,15 +91,6 @@ CREATE TABLE subscriptions
   PRIMARY KEY (id)
 );
 
-CREATE TABLE stripe_invoices
-(
-  id SERIAL,
-  subscription_id INTEGER REFERENCES subscriptions(id),
-  stripe_invoice_id VARCHAR(255),
-  stripe_status VARCHAR(255),
-  stripe_pdf_link VARCHAR(255),
-  PRIMARY KEY (id)
-);
 
 CREATE TABLE login_attempts
 (

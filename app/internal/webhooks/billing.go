@@ -10,6 +10,7 @@ import (
 	"example.com/internal/models"
 	"example.com/internal/repository"
 	"github.com/stripe/stripe-go/v72"
+	"github.com/stripe/stripe-go/v72/paymentlink"
 )
 
 func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
@@ -151,138 +152,95 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-	case "invoice.created":
-		type InvoiceCreated struct {
-			SubscriptionID string `json:"subscription"`
-			Status         string `json:"status"`
-			ID             string `json:"id"`
-			InvoicePDF     string `json:"invoice_pdf"`
+	case "product.created":
+		type ProductCreated struct {
+			ID          string  `json:"id"`
+			Name        string  `json:"name"`
+			Description *string `json:"description"`
 		}
 
-		var invoiceCreated InvoiceCreated
-		err := json.Unmarshal(stripe_data, &invoiceCreated)
+		var productCreated ProductCreated
+		err := json.Unmarshal(stripe_data, &productCreated)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		err = db.CreateInvoice(
-			invoiceCreated.SubscriptionID,
-			invoiceCreated.ID,
-			invoiceCreated.Status,
-			invoiceCreated.InvoicePDF,
-		)
+		var description string
+		if productCreated.Description != nil {
+			description = *productCreated.Description
+		} else {
+			description = ""
+		}
+
+		err = db.CreateProduct(
+			productCreated.ID,
+			productCreated.Name,
+			description)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error creating invoice: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error creating product: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-	case "invoice.paid":
-		type InvoicePaid struct {
-			Status string `json:"status"`
-			ID     string `json:"id"`
-			Lines  struct {
-				Data []struct {
-					Period struct {
-						Start int64 `json:"start"`
-						End   int64 `json:"end"`
-					} `json:"period"`
-				} `json:"data"`
-			} `json:"lines"`
+	case "price.created", "price.updated":
+		type PriceCreated struct {
+			ProductID  string `json:"product"`
+			UnitAmount int    `json:"unit_amount"`
 		}
 
-		var invoicePaid InvoicePaid
-		err := json.Unmarshal(stripe_data, &invoicePaid)
+		var priceCreated PriceCreated
+		err := json.Unmarshal(stripe_data, &priceCreated)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		err = db.UpdateStripeInvoiceAndSubscriptions(
-			invoicePaid.ID,
-			invoicePaid.Status,
-			invoicePaid.Lines.Data[0].Period.Start,
-			invoicePaid.Lines.Data[0].Period.End,
+		err = db.UpdateSubscriptionPricing(
+			priceCreated.ProductID,
+			priceCreated.UnitAmount,
 		)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error updating subscription: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Error updating subscription pricing: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-	case "invoice.updated":
-		type InvoicePaid struct {
-			Status string `json:"status"`
-			ID     string `json:"id"`
-			Lines  struct {
-				Data []struct {
-					Period struct {
-						Start int64 `json:"start"`
-						End   int64 `json:"end"`
-					} `json:"period"`
-				} `json:"data"`
-			} `json:"lines"`
+
+	case "payment_link.created":
+		type PaymentLinkCreated struct {
+			ID string `json:"id"`
 		}
 
-		var invoicePaid InvoicePaid
-		err := json.Unmarshal(stripe_data, &invoicePaid)
+		var paymentLinkCreated PaymentLinkCreated
+		err := json.Unmarshal(stripe_data, &paymentLinkCreated)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
+		stripe.Key = stripeSecretKey
+		params := &stripe.PaymentLinkListLineItemsParams{
+			PaymentLink: stripe.String(paymentLinkCreated.ID),
+		}
+		result := paymentlink.ListLineItems(params)
 
-		err = db.UpdateStripeInvoiceAndSubscriptions(
-			invoicePaid.ID,
-			invoicePaid.Status,
-			invoicePaid.Lines.Data[0].Period.Start,
-			invoicePaid.Lines.Data[0].Period.End,
+		if result.Err() != nil {
+			fmt.Fprintf(os.Stderr, "Error getting payment link: %v\n", result.Err())
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		ProductID := result.LineItem().Price.Product.ID
+
+		err = db.UpdateStripePaymentLink(
+			paymentLinkCreated.ID,
+			ProductID,
 		)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error updating subscription: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-	case "invoice.payment_succeeded":
-		type InvoicePaid struct {
-			Status string `json:"status"`
-			ID     string `json:"id"`
-			Lines  struct {
-				Data []struct {
-					Period struct {
-						Start int64 `json:"start"`
-						End   int64 `json:"end"`
-					} `json:"period"`
-				} `json:"data"`
-			} `json:"lines"`
-		}
-
-		var invoicePaid InvoicePaid
-		err := json.Unmarshal(stripe_data, &invoicePaid)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		err = db.UpdateStripeInvoiceAndSubscriptions(
-			invoicePaid.ID,
-			invoicePaid.Status,
-			invoicePaid.Lines.Data[0].Period.Start,
-			invoicePaid.Lines.Data[0].Period.End,
-		)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error updating subscription: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
