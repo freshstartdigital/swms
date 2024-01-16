@@ -9,8 +9,8 @@ import (
 
 	"example.com/internal/models"
 	"example.com/internal/repository"
+	"example.com/internal/services"
 	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/paymentlink"
 )
 
 func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
@@ -222,18 +222,12 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
-		stripe.Key = stripeSecretKey
-		params := &stripe.PaymentLinkListLineItemsParams{
-			PaymentLink: stripe.String(paymentLinkCreated.ID),
-		}
 
-		// List line items for the payment link
-		result := paymentlink.ListLineItems(params)
+		ProductID, err := services.GetProductIDFromPaymentLink(paymentLinkCreated.ID)
 
 		err = db.UpdateStripePaymentLink(
 			paymentLinkCreated.ID,
-			result.LineItem().Price.Product.ID,
+			ProductID,
 		)
 	default:
 		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
