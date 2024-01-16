@@ -227,21 +227,14 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 		params := &stripe.PaymentLinkListLineItemsParams{
 			PaymentLink: stripe.String(paymentLinkCreated.ID),
 		}
+
+		// List line items for the payment link
 		result := paymentlink.ListLineItems(params)
-
-		if result.Err() != nil {
-			fmt.Fprintf(os.Stderr, "Error getting payment link: %v\n", result.Err())
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		ProductID := result.LineItem().Price.Product.ID
 
 		err = db.UpdateStripePaymentLink(
 			paymentLinkCreated.ID,
-			ProductID,
+			result.LineItem().Price.Product.ID,
 		)
-
 	default:
 		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
 	}
