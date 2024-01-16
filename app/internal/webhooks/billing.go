@@ -212,7 +212,8 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	case "payment_link.created":
 		type PaymentLinkCreated struct {
-			ID string `json:"id"`
+			ID  string `json:"id"`
+			URL string `json:"url"`
 		}
 
 		var paymentLinkCreated PaymentLinkCreated
@@ -225,10 +226,23 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 		ProductID, err := services.GetProductIDFromPaymentLink(paymentLinkCreated.ID)
 
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error getting product ID from payment link: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		err = db.UpdateStripePaymentLink(
-			paymentLinkCreated.ID,
 			ProductID,
+			paymentLinkCreated.URL,
 		)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error updating stripe payment link: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 	default:
 		fmt.Fprintf(os.Stderr, "Unhandled event type: %s\n", event.Type)
 	}
