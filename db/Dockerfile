@@ -9,7 +9,11 @@ ENV POSTGRES_DB your_db_name
 # Copy the seed.sql file to the container
 COPY seed.sql /docker-entrypoint-initdb.d/
 
-# RUN apt-get update && apt-get install -y <package-name>
+# Enable remote connections
+RUN echo "listen_addresses = '*'" >> /usr/share/postgresql/postgresql.conf.sample
 
-# Expose the default PostgreSQL port
-EXPOSE 5432
+# Allow all IP addresses to connect with a password
+RUN echo "host all all 0.0.0.0/0 md5" >> /usr/share/postgresql/pg_hba.conf.sample
+
+# Expose the default PostgreSQL port (not necessary if you're using -p with docker run)
+# EXPOSE 5432
