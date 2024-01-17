@@ -257,6 +257,8 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		log.Println("Product ID:", ProductID)
+
 		err = db.UpdateStripePaymentLink(
 			ProductID,
 			paymentLinkCreated.URL,

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -36,7 +37,7 @@ type PaymentLinkResponse struct {
 // GetProductIDFromPaymentLink fetches the product ID associated with the provided payment link ID
 func GetProductIDFromPaymentLink(paymentLinkID string) (string, error) {
 	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
-
+	log.Println("Stripe secret key:", stripeSecretKey)
 	// Construct the URL for the Stripe endpoint
 	stripeURL := fmt.Sprintf("https://api.stripe.com/v1/payment_links/%s/line_items", paymentLinkID)
 
@@ -78,18 +79,4 @@ func GetProductIDFromPaymentLink(paymentLinkID string) (string, error) {
 	}
 
 	return "", fmt.Errorf("No line items found in the payment link response")
-}
-
-func main() {
-	// Replace "your_payment_link_id" with the actual payment link ID for testing
-	paymentLinkID := "your_payment_link_id"
-
-	// Call the function to get the product ID
-	productID, err := GetProductIDFromPaymentLink(paymentLinkID)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Println("Product ID:", productID)
 }

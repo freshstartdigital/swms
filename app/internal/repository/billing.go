@@ -204,6 +204,7 @@ func (db *DB) UpdateStripePaymentLink(ID string, link string) error {
 	)
 
 	if err != nil {
+		log.Println("Error executing UpdateStripePaymentLink statement:", err)
 		return err
 	}
 
