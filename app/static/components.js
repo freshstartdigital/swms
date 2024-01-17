@@ -6,7 +6,7 @@ class NavigationBar extends HTMLElement {
         <style>
           /* Add any styles for the shadow DOM here */
           nav {
-            background-color: #333;
+            background-color: #00227C;
             overflow: hidden;
             height: 80px;
             display: flex;

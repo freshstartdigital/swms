@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"time"
 
@@ -53,22 +54,26 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subscriptions, err := db.GetSubscriptionByOrgID(organisation.ID)
-
-	if err != nil {
-		// Log the error and return
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
-
-	currentPeriodStart := time.Unix(subscriptions.CurrentPeriodStart, 0).Format("02/01/2006")
-	currentPeriodEnd := time.Unix(subscriptions.CurrentPeriodEnd, 0).Format("02/01/2006")
-
 	type AccountPageResponse struct {
 		User               models.Users
 		Organisation       models.Organisations
 		CurrentPeriodEnd   string
 		CurrentPeriodStart string
+	}
+
+	var currentPeriodStart string
+	var currentPeriodEnd string
+
+	subscriptions, errorMessage := db.GetSubscriptionByOrgID(organisation.ID)
+
+	if errorMessage != nil {
+		log.Println("err fetching sub", errorMessage)
+		currentPeriodEnd = "N/A"
+		currentPeriodStart = "N/A"
+	} else {
+
+		currentPeriodStart = time.Unix(subscriptions.CurrentPeriodStart, 0).Format("02/01/2006")
+		currentPeriodEnd = time.Unix(subscriptions.CurrentPeriodEnd, 0).Format("02/01/2006")
 	}
 
 	accountPageResponse := AccountPageResponse{
