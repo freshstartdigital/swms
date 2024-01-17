@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -185,7 +186,31 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-	case "price.created", "price.updated":
+	case "price.created":
+		type PriceCreated struct {
+			ProductID  string `json:"product"`
+			UnitAmount int    `json:"unit_amount"`
+		}
+
+		var priceCreated PriceCreated
+		err := json.Unmarshal(stripe_data, &priceCreated)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = db.UpdateSubscriptionPricing(
+			priceCreated.ProductID,
+			priceCreated.UnitAmount,
+		)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error updating subscription pricing: %v\n", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	case "price.updated":
 		type PriceCreated struct {
 			ProductID  string `json:"product"`
 			UnitAmount int    `json:"unit_amount"`
@@ -215,11 +240,11 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 			ID  string `json:"id"`
 			URL string `json:"url"`
 		}
-
+		log.Println("Payment link created")
 		var paymentLinkCreated PaymentLinkCreated
 		err := json.Unmarshal(stripe_data, &paymentLinkCreated)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error parsing webhook JSON: %v\n", err)
+			log.Println("Error parsing webhook JSON:", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -227,7 +252,7 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 		ProductID, err := services.GetProductIDFromPaymentLink(paymentLinkCreated.ID)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error getting product ID from payment link: %v\n", err)
+			log.Println("Error getting product ID from payment link:", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -238,7 +263,7 @@ func BillingWebhookHandler(w http.ResponseWriter, req *http.Request) {
 		)
 
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error updating stripe payment link: %v\n", err)
+			log.Println("Error updating stripe payment link:", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
