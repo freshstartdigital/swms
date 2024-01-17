@@ -20,8 +20,9 @@ type PaymentLinkLineItem struct {
 	Currency       string `json:"currency"`
 	Description    string `json:"description"`
 	Price          struct {
-		ID   string `json:"id"`
-		Type string `json:"type"`
+		ID      string `json:"id"`
+		Type    string `json:"type"`
+		Product string `json:"product"`
 	} `json:"price"`
 	Quantity int `json:"quantity"`
 }
@@ -74,7 +75,7 @@ func GetProductIDFromPaymentLink(paymentLinkID string) (string, error) {
 	// Check if there is at least one line item in the response
 	if len(paymentLinkResponse.Data) > 0 {
 		// Retrieve the Product ID from the first line item
-		productID := paymentLinkResponse.Data[0].Price.ID
+		productID := paymentLinkResponse.Data[0].Price.Product
 		return productID, nil
 	}
 
